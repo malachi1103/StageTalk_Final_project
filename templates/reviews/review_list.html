@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">All Reviews</h2>
+
+    {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ review.event.name }}</h5>
+                <p class="card-text">
+                    <strong>Rating:</strong> {{ review.rating }}/5 <br>
+                    <strong>Comment:</strong> {{ review.comment }}
+                </p>
+                <small class="text-muted">By {{ review.user.username }} on {{ review.created_at|date:"M d, Y" }}</small>
+
+                {% if request.user == review.user %}
+                <div class="mt-2">
+                    <a href="{% url 'edit_review' review.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'delete_review' review.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>No reviews yet. Be the first to write one!</p>
+    {% endfor %}
+</div>
+{% endblock %}

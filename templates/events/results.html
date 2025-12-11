@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Event Search</h2>
+
+    <!-- Search Form -->
+    <form method="get" action="{% url 'events' %}" class="row g-3 mb-4">
+        <div class="col-md-5">
+            <select name="search_term" class="form-select">
+                <option value="">Select event type</option>
+                <option value="Music" {% if request.GET.search_term == "Music" %}selected{% endif %}>Music</option>
+                <option value="Arts & Theatre" {% if request.GET.search_term == "Arts & Theatre" %}selected{% endif %}>Arts & Theatre</option>
+                <option value="Miscellaneous" {% if request.GET.search_term == "Miscellaneous" %}selected{% endif %}>Family Events</option>
+                <option value="Sports" {% if request.GET.search_term == "Sports" %}selected{% endif %}>Sports</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <input type="text" name="city" class="form-control"
+                   placeholder="Enter a city (e.g. New York)"
+                   value="{{ request.GET.city }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    <!-- Event Results -->
+    <div class="row">
+        {% for event in events_list %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if event.image_url %}
+                        <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.name }}">
+                    {% else %}
+                        <div class="bg-secondary text-white text-center p-5">
+                            <p>No image available</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.name }}</h5>
+                        <p class="card-text">
+                            {% if event.start_date_time %}
+                                {{ event.start_date_time|date:"l, F d, Y @ h:i A" }}<br>
+                            {% endif %}
+                            {{ event.venue_name }}{% if event.venue_city %}, {{ event.venue_city }}{% endif %}
+                        </p>
+                        <a href="{{ event.url }}" class="btn btn-primary" target="_blank">Find Tickets</a>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div class="card-footer">
+                        <h6>Reviews:</h6>
+                        {% if event.reviews.all %}
+                            <ul class="list-unstyled">
+                                {% for review in event.reviews.all %}
+                                    <li>
+                                        <strong>{{ review.user.username }}</strong>:
+                                        {{ review.comment }} ({{ review.rating }}★)
+                                        {% if request.user == review.user %}
+                                            <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary ms-2">Edit</a>
+                                            <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger ms-2">Delete</a>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No reviews yet. Be the first!</p>
+                        {% endif %}
+
+                        <!-- ✅ Always show Write a Review button -->
+                        <a href="{% url 'create_review' event.id %}" class="btn btn-sm btn-success mt-2">Write a Review</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">No events found. Try searching with different filters.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
